@@ -1,0 +1,1219 @@
+<!DOCTYPE html>
+<html lang="de" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>SalbeiMigräne Tracker</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        sage: {
+                            50: '#f2f5f3',
+                            100: '#e2e8e4',
+                            200: '#c5d3cb',
+                            300: '#a3b5aa',
+                            400: '#849b8e',
+                            500: '#647C6E', // Primary Sage Green
+                            600: '#52665a',
+                            700: '#425248',
+                            800: '#35413b',
+                            900: '#2c3531',
+                            950: '#19201d'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Google Fonts Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+        ::-webkit-scrollbar {
+            width: 4px;
+            height: 4px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #a3b5aa;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body class="h-full bg-sage-50 dark:bg-sage-950 text-sage-900 dark:text-sage-100 transition-colors duration-200 flex flex-col overflow-x-hidden">
+
+    <header class="bg-white dark:bg-sage-900 border-b border-sage-200 dark:border-sage-800 sticky top-0 z-30 px-4 py-3 flex items-center justify-between shadow-xs">
+        <div class="flex items-center space-x-2">
+            <div class="w-9 h-9 rounded-xl bg-sage-500 flex items-center justify-center text-white font-bold shadow-sm">
+                🌿
+            </div>
+            <div>
+                <h1 class="font-bold text-base leading-tight text-sage-900 dark:text-sage-100">SalbeiMigräne</h1>
+                <p class="text-xs text-sage-500 dark:text-sage-400">Dein sanfter Begleiter</p>
+            </div>
+        </div>
+        <div class="flex items-center space-x-2">
+            <button onclick="openNewAttackModal()" class="bg-sage-500 hover:bg-sage-600 active:scale-95 text-white px-3 py-2 rounded-xl text-sm font-medium flex items-center space-x-1.5 shadow-sm transition">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                <span>Neu</span>
+            </button>
+            <button onclick="openPwaModal()" class="p-2 rounded-xl text-sage-600 dark:text-sage-300 hover:bg-sage-100 dark:hover:bg-sage-800 transition" title="iPhone & PWA Anleitung">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
+            </button>
+        </div>
+    </header>
+
+    <main class="flex-1 overflow-y-auto pb-24 px-4 pt-4 max-w-xl w-full mx-auto">
+        
+        <!-- TAB 1: ÜBERSICHT -->
+        <section id="tab-overview" class="space-y-4 tab-content">
+            <!-- Quick Summary Card -->
+            <div class="bg-white dark:bg-sage-900 border border-sage-200 dark:border-sage-800 rounded-2xl p-5 shadow-xs">
+                <div class="flex justify-between items-start mb-3">
+                    <h2 class="font-semibold text-sage-800 dark:text-sage-200">Diesen Monat</h2>
+                    <span id="current-month-label" class="text-xs px-2.5 py-1 rounded-full bg-sage-100 dark:bg-sage-800 text-sage-700 dark:text-sage-300 font-medium"></span>
+                </div>
+                <div class="grid grid-cols-3 gap-3 text-center">
+                    <div class="bg-sage-50 dark:bg-sage-800/50 p-3 rounded-xl border border-sage-100 dark:border-sage-800">
+                        <span id="stat-count" class="text-2xl font-bold text-sage-700 dark:text-sage-300">0</span>
+                        <p class="text-[11px] text-sage-500 dark:text-sage-400 mt-0.5">Anfälle</p>
+                    </div>
+                    <div class="bg-sage-50 dark:bg-sage-800/50 p-3 rounded-xl border border-sage-100 dark:border-sage-800">
+                        <span id="stat-avg-pain" class="text-2xl font-bold text-sage-700 dark:text-sage-300">0.0</span>
+                        <p class="text-[11px] text-sage-500 dark:text-sage-400 mt-0.5">Ø Schmerz</p>
+                    </div>
+                    <div class="bg-sage-50 dark:bg-sage-800/50 p-3 rounded-xl border border-sage-100 dark:border-sage-800">
+                        <span id="stat-meds-total" class="text-2xl font-bold text-sage-700 dark:text-sage-300">0</span>
+                        <p class="text-[11px] text-sage-500 dark:text-sage-400 mt-0.5">Medikamente</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Action Banner -->
+            <div class="bg-gradient-to-r from-sage-500 to-sage-600 rounded-2xl p-4 text-white shadow-sm flex items-center justify-between">
+                <div class="space-y-1">
+                    <h3 class="font-semibold text-sm">Neuen Anfall dokumentieren</h3>
+                    <p class="text-xs text-sage-100">Erfasse Schmerz, Symptome & Medikamente.</p>
+                </div>
+                <button onclick="openNewAttackModal()" class="bg-white text-sage-800 px-4 py-2.5 rounded-xl text-xs font-semibold shadow hover:bg-sage-50 transition active:scale-95">
+                    Jetzt erfassen
+                </button>
+            </div>
+
+            <!-- Recent Attacks Header -->
+            <div class="flex justify-between items-center pt-2">
+                <h3 class="font-semibold text-sm text-sage-800 dark:text-sage-200">Letzte Einträge</h3>
+                <button onclick="switchTab('history')" class="text-xs text-sage-600 dark:text-sage-400 font-medium hover:underline">Alle anzeigen</button>
+            </div>
+
+            <!-- Recent Attacks List -->
+            <div id="recent-attacks-list" class="space-y-2.5">
+                <!-- Dynamically populated -->
+            </div>
+        </section>
+
+        <!-- TAB 2: KALENDER -->
+        <section id="tab-calendar" class="space-y-4 tab-content hidden">
+            <div class="bg-white dark:bg-sage-900 border border-sage-200 dark:border-sage-800 rounded-2xl p-4 shadow-xs">
+                <!-- Calendar Controls -->
+                <div class="flex justify-between items-center mb-4">
+                    <button onclick="changeMonth(-1)" class="p-2 rounded-xl hover:bg-sage-100 dark:hover:bg-sage-800 text-sage-700 dark:text-sage-300 transition">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+                    </button>
+                    <h2 id="calendar-month-year" class="font-bold text-base text-sage-900 dark:text-sage-100">Monat Jahr</h2>
+                    <button onclick="changeMonth(1)" class="p-2 rounded-xl hover:bg-sage-100 dark:hover:bg-sage-800 text-sage-700 dark:text-sage-300 transition">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                    </button>
+                </div>
+                <!-- Weekday Headers -->
+                <div class="grid grid-cols-7 gap-1 text-center text-xs font-semibold text-sage-500 mb-2">
+                    <div>Mo</div><div>Di</div><div>Mi</div><div>Do</div><div>Fr</div><div>Sa</div><div>So</div>
+                </div>
+                <!-- Days Grid -->
+                <div id="calendar-grid" class="grid grid-cols-7 gap-1.5">
+                    <!-- Dynamically populated -->
+                </div>
+            </div>
+
+            <!-- Selected Day Detail Card -->
+            <div id="calendar-day-detail" class="bg-white dark:bg-sage-900 border border-sage-200 dark:border-sage-800 rounded-2xl p-4 shadow-xs hidden">
+                <h3 id="calendar-selected-date" class="font-semibold text-sm text-sage-800 dark:text-sage-200 mb-2">Datum</h3>
+                <div id="calendar-day-attacks" class="space-y-2">
+                    <!-- Attacks on this day -->
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 3: VERLAUF / TIMELINE -->
+        <section id="tab-history" class="space-y-4 tab-content hidden">
+            <div class="flex items-center justify-between">
+                <h2 class="font-bold text-base text-sage-900 dark:text-sage-100">Anfall-Historie</h2>
+                <div class="text-xs text-sage-500" id="history-count">0 Einträge</div>
+            </div>
+            <!-- Search & Filter -->
+            <div class="relative">
+                <input type="text" id="history-search" placeholder="Suche nach Symptomen, Medikamenten..." oninput="renderHistory()" class="w-full bg-white dark:bg-sage-900 border border-sage-200 dark:border-sage-800 rounded-xl px-4 py-2.5 text-sm text-sage-900 dark:text-sage-100 focus:outline-none focus:ring-2 focus:ring-sage-500">
+            </div>
+            <!-- History List -->
+            <div id="full-history-list" class="space-y-3">
+                <!-- Dynamically populated -->
+            </div>
+        </section>
+
+        <!-- TAB 4: STATISTIKEN -->
+        <section id="tab-stats" class="space-y-4 tab-content hidden">
+            <h2 class="font-bold text-base text-sage-900 dark:text-sage-100">Auswertungen</h2>
+            
+            <!-- General Stats Overview -->
+            <div class="grid grid-cols-2 gap-3">
+                <div class="bg-white dark:bg-sage-900 border border-sage-200 dark:border-sage-800 rounded-2xl p-4 shadow-xs">
+                    <p class="text-xs text-sage-500">Gesamteinträge</p>
+                    <p id="stats-total-count" class="text-2xl font-bold text-sage-800 dark:text-sage-200 mt-1">0</p>
+                </div>
+                <div class="bg-white dark:bg-sage-900 border border-sage-200 dark:border-sage-800 rounded-2xl p-4 shadow-xs">
+                    <p class="text-xs text-sage-500">Einsätze mit Medikament</p>
+                    <p id="stats-med-attacks" class="text-2xl font-bold text-sage-800 dark:text-sage-200 mt-1">0</p>
+                </div>
+            </div>
+
+            <!-- Top Medications List -->
+            <div class="bg-white dark:bg-sage-900 border border-sage-200 dark:border-sage-800 rounded-2xl p-4 shadow-xs space-y-3">
+                <h3 class="font-semibold text-sm text-sage-800 dark:text-sage-200">Häufigste Medikamente</h3>
+                <div id="stats-meds-list" class="space-y-2">
+                    <!-- Dynamically populated -->
+                </div>
+            </div>
+
+            <!-- Top Triggers -->
+            <div class="bg-white dark:bg-sage-900 border border-sage-200 dark:border-sage-800 rounded-2xl p-4 shadow-xs space-y-3">
+                <h3 class="font-semibold text-sm text-sage-800 dark:text-sage-200">Häufigste Auslöser (Triggers)</h3>
+                <div id="stats-triggers-list" class="space-y-2">
+                    <!-- Dynamically populated -->
+                </div>
+            </div>
+
+            <!-- Top Symptoms -->
+            <div class="bg-white dark:bg-sage-900 border border-sage-200 dark:border-sage-800 rounded-2xl p-4 shadow-xs space-y-3">
+                <h3 class="font-semibold text-sm text-sage-800 dark:text-sage-200">Häufigste Symptome</h3>
+                <div id="stats-symptoms-list" class="space-y-2">
+                    <!-- Dynamically populated -->
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 5: EINSTELLUNGEN -->
+        <section id="tab-settings" class="space-y-4 tab-content hidden">
+            <h2 class="font-bold text-base text-sage-900 dark:text-sage-100">Einstellungen</h2>
+
+            <!-- Appearance -->
+            <div class="bg-white dark:bg-sage-900 border border-sage-200 dark:border-sage-800 rounded-2xl p-4 shadow-xs space-y-4">
+                <h3 class="font-semibold text-sm text-sage-800 dark:text-sage-200">Erscheinungsbild</h3>
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-sage-800 dark:text-sage-200">Dunkler Modus (Dark Mode)</p>
+                        <p class="text-xs text-sage-500">Beruhigende dunkle Salbei-Töne</p>
+                    </div>
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" id="dark-mode-toggle" onchange="toggleDarkMode()" class="sr-only peer">
+                        <div class="w-11 h-6 bg-sage-200 peer-focus:outline-none rounded-full peer dark:bg-sage-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-sage-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-sage-500"></div>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Data Management (Backup / Restore) -->
+            <div class="bg-white dark:bg-sage-900 border border-sage-200 dark:border-sage-800 rounded-2xl p-4 shadow-xs space-y-4">
+                <h3 class="font-semibold text-sm text-sage-800 dark:text-sage-200">Datensicherung (Backup)</h3>
+                <p class="text-xs text-sage-500">Deine Daten werden ausschließlich lokal auf deinem Gerät (iPhone Safari Speicher) gesichert. Lade dir regelmäßig ein JSON-Backup herunter.</p>
+                
+                <div class="flex space-x-3 pt-2">
+                    <button onclick="exportBackup()" class="flex-1 bg-sage-100 dark:bg-sage-800 hover:bg-sage-200 dark:hover:bg-sage-700 text-sage-800 dark:text-sage-200 py-2.5 px-4 rounded-xl text-xs font-semibold transition flex items-center justify-center space-x-1.5">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                        <span>Backup herunterladen</span>
+                    </button>
+                    <label class="flex-1 bg-sage-500 hover:bg-sage-600 text-white py-2.5 px-4 rounded-xl text-xs font-semibold transition flex items-center justify-center space-x-1.5 cursor-pointer shadow-sm">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
+                        <span>Wiederherstellen</span>
+                        <input type="file" id="import-file" accept=".json" onchange="importBackup(event)" class="hidden">
+                    </label>
+                </div>
+            </div>
+
+            <!-- iPhone PWA Guide Card -->
+            <div class="bg-sage-100 dark:bg-sage-900/50 border border-sage-200 dark:border-sage-800 rounded-2xl p-4 space-y-2">
+                <h3 class="font-semibold text-sm text-sage-800 dark:text-sage-200 flex items-center space-x-1.5">
+                    <span>📱</span>
+                    <span>iPhone & Safari Optimierung</span>
+                </h3>
+                <p class="text-xs text-sage-600 dark:text-sage-400">
+                    Füge SalbeiMigräne zu deinem iPhone-Home-Bildschirm hinzu, um die App im Vollbildmodus wie eine native App zu nutzen.
+                </p>
+                <button onclick="openPwaModal()" class="text-xs font-semibold text-sage-700 dark:text-sage-300 underline pt-1 inline-block">
+                    Anleitung öffnen &rarr;
+                </button>
+            </div>
+        </section>
+    </main>
+
+    <nav class="bg-white dark:bg-sage-900 border-t border-sage-200 dark:border-sage-800 fixed bottom-0 left-0 right-0 z-30 py-2 px-4 shadow-lg">
+        <div class="max-w-xl mx-auto flex justify-around items-center">
+            <button onclick="switchTab('overview')" id="nav-overview" class="nav-btn flex flex-col items-center space-y-1 text-sage-500 hover:text-sage-700 dark:hover:text-sage-300 transition">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+                <span class="text-[10px] font-medium">Übersicht</span>
+            </button>
+            <button onclick="switchTab('calendar')" id="nav-calendar" class="nav-btn flex flex-col items-center space-y-1 text-sage-500 hover:text-sage-700 dark:hover:text-sage-300 transition">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                <span class="text-[10px] font-medium">Kalender</span>
+            </button>
+            <button onclick="switchTab('history')" id="nav-history" class="nav-btn flex flex-col items-center space-y-1 text-sage-500 hover:text-sage-700 dark:hover:text-sage-300 transition">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                <span class="text-[10px] font-medium">Verlauf</span>
+            </button>
+            <button onclick="switchTab('stats')" id="nav-stats" class="nav-btn flex flex-col items-center space-y-1 text-sage-500 hover:text-sage-700 dark:hover:text-sage-300 transition">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+                <span class="text-[10px] font-medium">Statistik</span>
+            </button>
+            <button onclick="switchTab('settings')" id="nav-settings" class="nav-btn flex flex-col items-center space-y-1 text-sage-500 hover:text-sage-700 dark:hover:text-sage-300 transition">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.08 1.96.22 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                <span class="text-[10px] font-medium">Einstellungen</span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- MODAL: NEUER / BEARBEITEN ANFALL -->
+    <div id="modal-new-attack" class="fixed inset-0 bg-black/50 backdrop-blur-xs z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 hidden">
+        <div class="bg-white dark:bg-sage-900 w-full max-w-lg rounded-t-3xl sm:rounded-2xl max-h-[90vh] overflow-y-auto p-6 shadow-xl space-y-5">
+            <div class="flex justify-between items-center border-b border-sage-200 dark:border-sage-800 pb-3">
+                <h3 id="attack-modal-title" class="font-bold text-base text-sage-900 dark:text-sage-100">Migräneanfall erfassen</h3>
+                <button onclick="closeNewAttackModal()" class="p-1.5 rounded-lg text-sage-500 hover:bg-sage-100 dark:hover:bg-sage-800">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+
+            <form id="form-new-attack" onsubmit="saveNewAttack(event)" class="space-y-4">
+                <input type="hidden" id="edit-attack-id" value="">
+                <!-- Date & Time with "Jetzt" Button -->
+                <div>
+                    <div class="flex justify-between items-center mb-1">
+                        <label class="text-xs font-medium text-sage-700 dark:text-sage-300">Datum & Uhrzeit</label>
+                        <button type="button" onclick="setNowTimestamp()" class="text-[11px] bg-sage-100 dark:bg-sage-800 text-sage-700 dark:text-sage-300 px-2 py-0.5 rounded-md font-medium hover:bg-sage-200 transition">Jetzt</button>
+                    </div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <input type="date" id="input-date" required class="w-full bg-sage-50 dark:bg-sage-800 border border-sage-200 dark:border-sage-700 rounded-xl px-3 py-2 text-sm text-sage-900 dark:text-sage-100 focus:ring-2 focus:ring-sage-500 focus:outline-none">
+                        </div>
+                        <div>
+                            <input type="time" id="input-time" required class="w-full bg-sage-50 dark:bg-sage-800 border border-sage-200 dark:border-sage-700 rounded-xl px-3 py-2 text-sm text-sage-900 dark:text-sage-100 focus:ring-2 focus:ring-sage-500 focus:outline-none">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pain Scale 1-10 -->
+                <div>
+                    <div class="flex justify-between items-center mb-1">
+                        <label class="text-xs font-medium text-sage-700 dark:text-sage-300">Schmerzstärke (1-10)</label>
+                        <span id="pain-value-display" class="text-sm font-bold text-sage-700 dark:text-sage-300 px-2 py-0.5 rounded-md bg-sage-100 dark:bg-sage-800">5</span>
+                    </div>
+                    <input type="range" id="input-pain" min="1" max="10" value="5" oninput="document.getElementById('pain-value-display').innerText = this.value" class="w-full accent-sage-500 cursor-pointer">
+                    <div class="flex justify-between text-[10px] text-sage-400 mt-1">
+                        <span>Leicht (1-3)</span>
+                        <span>Mittel (4-6)</span>
+                        <span>Stark (7-10)</span>
+                    </div>
+                </div>
+
+                <!-- Symptoms Checkboxes -->
+                <div>
+                    <label class="block text-xs font-medium text-sage-700 dark:text-sage-300 mb-1.5">Symptome</label>
+                    <div id="checkboxes-symptoms" class="grid grid-cols-2 gap-2">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+
+                <!-- Potential Triggers -->
+                <div>
+                    <label class="block text-xs font-medium text-sage-700 dark:text-sage-300 mb-1.5">Mögliche Auslöser (Triggers)</label>
+                    <div id="checkboxes-triggers" class="grid grid-cols-2 gap-2">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+
+                <!-- Medication -->
+                <div>
+                    <label class="block text-xs font-medium text-sage-700 dark:text-sage-300 mb-1.5">Medikation bei Beginn</label>
+                    <div id="checkboxes-meds" class="grid grid-cols-2 gap-2">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+
+                <!-- Notes -->
+                <div>
+                    <label class="block text-xs font-medium text-sage-700 dark:text-sage-300 mb-1">Notizen</label>
+                    <textarea id="input-notes" rows="2" placeholder="Zusätzliche Beobachtungen..." class="w-full bg-sage-50 dark:bg-sage-800 border border-sage-200 dark:border-sage-700 rounded-xl px-3 py-2 text-sm text-sage-900 dark:text-sage-100 focus:ring-2 focus:ring-sage-500 focus:outline-none"></textarea>
+                </div>
+
+                <!-- Submit Button -->
+                <div class="pt-2">
+                    <button type="submit" class="w-full bg-sage-500 hover:bg-sage-600 active:scale-95 text-white py-3 rounded-xl font-semibold text-sm shadow-sm transition">
+                        Speichern
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL: ATTACK DETAIL / FOLLOW-UP -->
+    <div id="modal-detail" class="fixed inset-0 bg-black/50 backdrop-blur-xs z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 hidden">
+        <div class="bg-white dark:bg-sage-900 w-full max-w-lg rounded-t-3xl sm:rounded-2xl max-h-[90vh] overflow-y-auto p-6 shadow-xl space-y-4">
+            <div class="flex justify-between items-center border-b border-sage-200 dark:border-sage-800 pb-3">
+                <div>
+                    <h3 id="detail-title" class="font-bold text-base text-sage-900 dark:text-sage-100">Anfall Details</h3>
+                    <p id="detail-subtitle" class="text-xs text-sage-500">Datum & Uhrzeit</p>
+                </div>
+                <button onclick="closeDetailModal()" class="p-1.5 rounded-lg text-sage-500 hover:bg-sage-100 dark:hover:bg-sage-800">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+
+            <!-- Initial Info Summary with Edit Button -->
+            <div class="relative bg-sage-50 dark:bg-sage-800/50 p-3.5 rounded-xl space-y-2 text-xs">
+                <button onclick="editCurrentAttack()" class="absolute top-3 right-3 text-sage-600 dark:text-sage-300 hover:underline font-medium flex items-center space-x-1 bg-white dark:bg-sage-900 px-2 py-1 rounded-lg border border-sage-200 dark:border-sage-700 shadow-xs">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                    <span>Bearbeiten</span>
+                </button>
+                <div id="detail-initial-info">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+
+            <!-- Follow-up Timeline & Additions -->
+            <div class="space-y-3 pt-2">
+                <h4 class="font-semibold text-xs text-sage-800 dark:text-sage-200 uppercase tracking-wider">Verlauf & Nachbereitung (Follow-up)</h4>
+                <div id="detail-followups-list" class="space-y-2">
+                    <!-- Populated by JS -->
+                </div>
+
+                <!-- Add / Edit Follow-up Form -->
+                <div class="bg-sage-50/50 dark:bg-sage-800/30 border border-sage-200 dark:border-sage-700/60 p-3.5 rounded-xl space-y-3">
+                    <p id="fu-form-title" class="text-xs font-medium text-sage-800 dark:text-sage-200">Update hinzufügen (Schmerzänderung, Medikament, Notiz)</p>
+                    <input type="hidden" id="edit-fu-index" value="">
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <label class="block text-[11px] text-sage-500 mb-1">Neuer Schmerz (1-10)</label>
+                            <input type="number" id="fu-pain" min="1" max="10" placeholder="z.B. 3" class="w-full bg-white dark:bg-sage-900 border border-sage-200 dark:border-sage-700 rounded-lg px-2.5 py-1.5 text-xs text-sage-900 dark:text-sage-100 focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-[11px] text-sage-500 mb-1">Zusatzmedikament</label>
+                            <select id="fu-med" class="w-full bg-white dark:bg-sage-900 border border-sage-200 dark:border-sage-700 rounded-lg px-2.5 py-1.5 text-xs text-sage-900 dark:text-sage-100 focus:outline-none">
+                                <option value="">Kein Med.</option>
+                                <option value="Naratriptan">Naratriptan</option>
+                                <option value="Ibuprofen">Ibuprofen</option>
+                                <option value="Paracetamol">Paracetamol</option>
+                                <option value="Sumatriptan">Sumatriptan</option>
+                                <option value="Aspirin">Aspirin</option>
+                                <option value="Magnesium">Magnesium</option>
+                                <option value="Almotriptan">Almotriptan</option>
+                                <option value="Naproxen">Naproxen</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-[11px] text-sage-500 mb-1">Notiz / Verlauf</label>
+                        <input type="text" id="fu-note" placeholder="z.B. Nach 2 Stunden deutliche Besserung..." class="w-full bg-white dark:bg-sage-900 border border-sage-200 dark:border-sage-700 rounded-lg px-2.5 py-1.5 text-xs text-sage-900 dark:text-sage-100 focus:outline-none">
+                    </div>
+                    <div class="flex space-x-2">
+                        <button onclick="saveFollowUp()" id="fu-submit-btn" class="flex-1 bg-sage-500 hover:bg-sage-600 text-white font-medium py-2 rounded-lg text-xs transition">
+                            Update speichern
+                        </button>
+                        <button onclick="cancelFollowUpEdit()" id="fu-cancel-btn" class="hidden bg-sage-200 dark:bg-sage-700 text-sage-800 dark:text-sage-200 font-medium py-2 px-3 rounded-lg text-xs transition">
+                            Abbrechen
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Delete Attack -->
+            <div class="pt-2 border-t border-sage-200 dark:border-sage-800 flex justify-between items-center">
+                <button onclick="deleteCurrentAttack()" class="text-xs text-red-500 hover:underline font-medium">Anfall löschen</button>
+                <button onclick="closeDetailModal()" class="text-xs text-sage-600 dark:text-sage-400 font-medium">Schließen</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: PWA GUIDELINE -->
+    <div id="modal-pwa" class="fixed inset-0 bg-black/50 backdrop-blur-xs z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white dark:bg-sage-900 w-full max-w-md rounded-2xl p-5 shadow-xl space-y-4">
+            <div class="flex justify-between items-center border-b border-sage-200 dark:border-sage-800 pb-3">
+                <h3 class="font-bold text-base text-sage-900 dark:text-sage-100 flex items-center space-x-1.5">
+                    <span>📱</span>
+                    <span>iPhone & Safari Anleitung</span>
+                </h3>
+                <button onclick="closePwaModal()" class="p-1.5 rounded-lg text-sage-500 hover:bg-sage-100 dark:hover:bg-sage-800">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            <div class="space-y-3 text-xs text-sage-700 dark:text-sage-300">
+                <p>Nutze SalbeiMigräne direkt auf deinem iPhone-Home-Bildschirm für besten Vollbildkomfort:</p>
+                <ol class="list-decimal pl-4 space-y-2">
+                    <li>Öffne diese Seite in <b>Safari</b> auf deinem iPhone.</li>
+                    <li>Tippe unten in der Safari-Leiste auf das <b>Teilen-Symbol</b> (Viereck mit Pfeil nach oben).</li>
+                    <li>Scrolle im Menü nach unten und wähle <b>„Zum Home-Bildschirm“</b>.</li>
+                    <li>Tippe oben rechts auf <b>„Hinzufügen“</b>.</li>
+                </ol>
+                <p class="text-[11px] text-sage-500 pt-1">Deine Daten bleiben zu 100% lokal auf deinem Gerät gespeichert.</p>
+            </div>
+            <button onclick="closePwaModal()" class="w-full bg-sage-500 hover:bg-sage-600 text-white font-medium py-2.5 rounded-xl text-xs transition">
+                Verstanden
+            </button>
+        </div>
+    </div>
+
+    <!-- CUSTOM CONFIRMATION & TOAST MODAL -->
+    <div id="modal-confirm" class="fixed inset-0 bg-black/50 backdrop-blur-xs z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white dark:bg-sage-900 w-full max-w-sm rounded-2xl p-5 shadow-xl space-y-4">
+            <h3 id="confirm-title" class="font-bold text-base text-sage-900 dark:text-sage-100">Bestätigung</h3>
+            <p id="confirm-text" class="text-xs text-sage-600 dark:text-sage-300">Möchtest du diese Aktion wirklich ausführen?</p>
+            <div class="flex space-x-2 pt-2">
+                <button id="confirm-yes-btn" class="flex-1 bg-red-500 hover:bg-red-600 text-white py-2 rounded-xl text-xs font-semibold transition">Löschen</button>
+                <button onclick="closeConfirmModal()" class="flex-1 bg-sage-100 dark:bg-sage-800 text-sage-800 dark:text-sage-200 py-2 rounded-xl text-xs font-semibold transition">Abbrechen</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- TOAST NOTIFICATION -->
+    <div id="toast-notification" class="fixed bottom-20 left-1/2 transform -translate-x-1/2 bg-sage-900 dark:bg-white text-white dark:text-sage-900 px-4 py-2.5 rounded-xl text-xs font-medium shadow-lg z-50 opacity-0 pointer-events-none transition-opacity duration-300">
+        Meldung
+    </div>
+
+    <script>
+        // Constants & Options
+        const SYMPTOMS_LIST = [
+            'Übelkeit', 'Aura', 'Lichtempfindlichkeit', 'Lärmempfindlichkeit', 
+            'Schwindel', 'Müdigkeit', 'Nackenschmerzen', 'Sehstörungen'
+        ];
+        const TRIGGERS_LIST = [
+            'Stress', 'Wetterwechsel', 'Schlafmangel', 'Alkohol', 
+            'Hormone', 'Bildschirmzeit', 'Kaffee-Entzug', 'Langes Fasten'
+        ];
+        const MEDS_LIST = [
+            'Naratriptan', 'Ibuprofen', 'Paracetamol', 'Sumatriptan', 
+            'Aspirin', 'Magnesium', 'Almotriptan', 'Naproxen'
+        ];
+
+        // State Store
+        let state = {
+            attacks: [],
+            settings: {
+                darkMode: false
+            },
+            currentTab: 'overview',
+            calendarDate: new Date(),
+            selectedAttackId: null,
+            confirmCallback: null
+        };
+
+        // Initialize Application
+        window.onload = function() {
+            loadFromLocalStorage();
+            populateFormCheckboxes();
+            initDateInputs();
+            switchTab('overview');
+            renderApp();
+        };
+
+        // Toast Notification System (replaces alert)
+        function showToast(message) {
+            const toast = document.getElementById('toast-notification');
+            toast.innerText = message;
+            toast.classList.remove('opacity-0', 'pointer-events-none');
+            toast.classList.add('opacity-100');
+            setTimeout(() => {
+                toast.classList.remove('opacity-100');
+                toast.classList.add('opacity-0', 'pointer-events-none');
+            }, 3000);
+        }
+
+        // Custom Confirm Modal (replaces confirm)
+        function showConfirm(title, text, onYes) {
+            document.getElementById('confirm-title').innerText = title;
+            document.getElementById('confirm-text').innerText = text;
+            state.confirmCallback = onYes;
+            document.getElementById('modal-confirm').classList.remove('hidden');
+        }
+
+        document.getElementById('confirm-yes-btn').onclick = function() {
+            if (typeof state.confirmCallback === 'function') {
+                state.confirmCallback();
+            }
+            closeConfirmModal();
+        };
+
+        function closeConfirmModal() {
+            document.getElementById('modal-confirm').classList.add('hidden');
+            state.confirmCallback = null;
+        }
+
+        // Storage Management
+        function saveToLocalStorage() {
+            localStorage.setItem('salbei_migraene_data', JSON.stringify(state.attacks));
+            localStorage.setItem('salbei_migraene_settings', JSON.stringify(state.settings));
+        }
+
+        function loadFromLocalStorage() {
+            const savedData = localStorage.getItem('salbei_migraene_data');
+            const savedSettings = localStorage.getItem('salbei_migraene_settings');
+
+            if (savedData) {
+                try { state.attacks = JSON.parse(savedData); } catch(e) { state.attacks = []; }
+            } else {
+                // Seed sample data for first-time users
+                state.attacks = [
+                    {
+                        id: 'sample-1',
+                        date: new Date(Date.now() - 86400000 * 2).toISOString().split('T')[0],
+                        time: '08:30',
+                        pain: 7,
+                        symptoms: ['Übelkeit', 'Lichtempfindlichkeit'],
+                        triggers: ['Stress', 'Schlafmangel'],
+                        meds: ['Naratriptan'],
+                        notes: 'Begann morgens beim Aufstehen.',
+                        followups: [
+                            { time: '11:30', pain: 3, med: '', note: 'Nach Naratriptan deutlich besser.' }
+                        ]
+                    }
+                ];
+            }
+
+            if (savedSettings) {
+                try { state.settings = JSON.parse(savedSettings); } catch(e) {}
+            }
+
+            applyDarkModeState();
+        }
+
+        // Dark Mode Logic
+        function applyDarkModeState() {
+            const htmlEl = document.documentElement;
+            const toggleEl = document.getElementById('dark-mode-toggle');
+            if (state.settings.darkMode) {
+                htmlEl.classList.add('dark');
+                if (toggleEl) toggleEl.checked = true;
+            } else {
+                htmlEl.classList.remove('dark');
+                if (toggleEl) toggleEl.checked = false;
+            }
+        }
+
+        function toggleDarkMode() {
+            state.settings.darkMode = document.getElementById('dark-mode-toggle').checked;
+            applyDarkModeState();
+            saveToLocalStorage();
+        }
+
+        // Tab Navigation
+        function switchTab(tabId) {
+            state.currentTab = tabId;
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('text-sage-700', 'dark:text-sage-200', 'font-semibold'));
+            document.querySelectorAll('.nav-btn').forEach(el => el.classList.add('text-sage-500'));
+
+            const targetTab = document.getElementById(`tab-${tabId}`);
+            if (targetTab) targetTab.classList.remove('hidden');
+
+            const targetNav = document.getElementById(`nav-${tabId}`);
+            if (targetNav) {
+                targetNav.classList.remove('text-sage-500');
+                targetNav.classList.add('text-sage-700', 'dark:text-sage-200', 'font-semibold');
+            }
+
+            renderApp();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Render Dispatcher
+        function renderApp() {
+            renderOverview();
+            renderCalendar();
+            renderHistory();
+            renderStats();
+        }
+
+        // Form Checkboxes Population
+        function populateFormCheckboxes() {
+            const symContainer = document.getElementById('checkboxes-symptoms');
+            symContainer.innerHTML = SYMPTOMS_LIST.map(sym => `
+                <label class="flex items-center space-x-2 text-xs text-sage-700 dark:text-sage-300 bg-sage-50 dark:bg-sage-800 p-2 rounded-xl cursor-pointer">
+                    <input type="checkbox" name="symptom" value="${sym}" class="rounded text-sage-500 focus:ring-sage-500">
+                    <span>${sym}</span>
+                </label>
+            `).join('');
+
+            const trigContainer = document.getElementById('checkboxes-triggers');
+            trigContainer.innerHTML = TRIGGERS_LIST.map(trig => `
+                <label class="flex items-center space-x-2 text-xs text-sage-700 dark:text-sage-300 bg-sage-50 dark:bg-sage-800 p-2 rounded-xl cursor-pointer">
+                    <input type="checkbox" name="trigger" value="${trig}" class="rounded text-sage-500 focus:ring-sage-500">
+                    <span>${trig}</span>
+                </label>
+            `).join('');
+
+            const medContainer = document.getElementById('checkboxes-meds');
+            medContainer.innerHTML = MEDS_LIST.map(med => `
+                <label class="flex items-center space-x-2 text-xs text-sage-700 dark:text-sage-300 bg-sage-50 dark:bg-sage-800 p-2 rounded-xl cursor-pointer">
+                    <input type="checkbox" name="med" value="${med}" class="rounded text-sage-500 focus:ring-sage-500">
+                    <span>${med}</span>
+                </label>
+            `).join('');
+        }
+
+        function initDateInputs() {
+            const now = new Date();
+            const dateStr = now.toISOString().split('T')[0];
+            const timeStr = now.toTimeString().substring(0, 5);
+            const dateInput = document.getElementById('input-date');
+            const timeInput = document.getElementById('input-time');
+            if (dateInput && !dateInput.value) dateInput.value = dateStr;
+            if (timeInput && !timeInput.value) timeInput.value = timeStr;
+        }
+
+        function setNowTimestamp() {
+            const now = new Date();
+            document.getElementById('input-date').value = now.toISOString().split('T')[0];
+            document.getElementById('input-time').value = now.toTimeString().substring(0, 5);
+            showToast('Aktuelle Zeit übernommen');
+        }
+
+        // Modal Controls (New / Edit Attack)
+        function openNewAttackModal(attackToEdit = null) {
+            document.getElementById('edit-attack-id').value = '';
+            document.getElementById('attack-modal-title').innerText = 'Migräneanfall erfassen';
+            initDateInputs();
+            document.getElementById('input-pain').value = 5;
+            document.getElementById('pain-value-display').innerText = '5';
+            document.getElementById('input-notes').value = '';
+            document.querySelectorAll('#form-new-attack input[type="checkbox"]').forEach(cb => cb.checked = false);
+
+            if (attackToEdit) {
+                document.getElementById('edit-attack-id').value = attackToEdit.id;
+                document.getElementById('attack-modal-title').innerText = 'Migräneanfall bearbeiten';
+                document.getElementById('input-date').value = attackToEdit.date;
+                document.getElementById('input-time').value = attackToEdit.time;
+                document.getElementById('input-pain').value = attackToEdit.pain;
+                document.getElementById('pain-value-display').innerText = attackToEdit.pain;
+                document.getElementById('input-notes').value = attackToEdit.notes || '';
+
+                // Check symptoms
+                document.querySelectorAll('input[name="symptom"]').forEach(cb => {
+                    if (attackToEdit.symptoms && attackToEdit.symptoms.includes(cb.value)) cb.checked = true;
+                });
+                // Check triggers
+                document.querySelectorAll('input[name="trigger"]').forEach(cb => {
+                    if (attackToEdit.triggers && attackToEdit.triggers.includes(cb.value)) cb.checked = true;
+                });
+                // Check meds
+                document.querySelectorAll('input[name="med"]').forEach(cb => {
+                    if (attackToEdit.meds && attackToEdit.meds.includes(cb.value)) cb.checked = true;
+                });
+            }
+
+            document.getElementById('modal-new-attack').classList.remove('hidden');
+        }
+
+        function closeNewAttackModal() {
+            document.getElementById('modal-new-attack').classList.add('hidden');
+        }
+
+        function openPwaModal() {
+            document.getElementById('modal-pwa').classList.remove('hidden');
+        }
+
+        function closePwaModal() {
+            document.getElementById('modal-pwa').classList.add('hidden');
+        }
+
+        // Save New or Edited Attack
+        function saveNewAttack(e) {
+            e.preventDefault();
+            const editId = document.getElementById('edit-attack-id').value;
+            const date = document.getElementById('input-date').value;
+            const time = document.getElementById('input-time').value;
+            const pain = parseInt(document.getElementById('input-pain').value);
+            const notes = document.getElementById('input-notes').value;
+
+            const symptoms = Array.from(document.querySelectorAll('input[name="symptom"]:checked')).map(cb => cb.value);
+            const triggers = Array.from(document.querySelectorAll('input[name="trigger"]:checked')).map(cb => cb.value);
+            const meds = Array.from(document.querySelectorAll('input[name="med"]:checked')).map(cb => cb.value);
+
+            if (editId) {
+                // Update existing
+                const index = state.attacks.findIndex(item => item.id === editId);
+                if (index !== -1) {
+                    state.attacks[index].date = date;
+                    state.attacks[index].time = time;
+                    state.attacks[index].pain = pain;
+                    state.attacks[index].symptoms = symptoms;
+                    state.attacks[index].triggers = triggers;
+                    state.attacks[index].meds = meds;
+                    state.attacks[index].notes = notes;
+                }
+                showToast('Anfall erfolgreich aktualisiert!');
+            } else {
+                // Create new
+                const newAttack = {
+                    id: 'attack-' + Date.now(),
+                    date,
+                    time,
+                    pain,
+                    symptoms,
+                    triggers,
+                    meds,
+                    notes,
+                    followups: []
+                };
+                state.attacks.unshift(newAttack);
+                showToast('Neuer Anfall gespeichert!');
+            }
+
+            saveToLocalStorage();
+            closeNewAttackModal();
+            if (state.selectedAttackId && editId === state.selectedAttackId) {
+                openDetailModal(editId);
+            }
+            renderApp();
+        }
+
+        // Overview Render
+        function renderOverview() {
+            const now = new Date();
+            const currentMonth = now.getMonth();
+            const currentYear = now.getFullYear();
+
+            const monthNames = ["Januar", "Februar", "März", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "November", "Dezember"];
+            document.getElementById('current-month-label').innerText = `${monthNames[currentMonth]} ${currentYear}`;
+
+            const monthlyAttacks = state.attacks.filter(a => {
+                const d = new Date(a.date);
+                return d.getMonth() === currentMonth && d.getFullYear() === currentYear;
+            });
+
+            document.getElementById('stat-count').innerText = monthlyAttacks.length;
+
+            const avgPain = monthlyAttacks.length > 0 
+                ? (monthlyAttacks.reduce((sum, a) => sum + a.pain, 0) / monthlyAttacks.length).toFixed(1)
+                : '0.0';
+            document.getElementById('stat-avg-pain').innerText = avgPain;
+
+            const medsMonthlyCount = monthlyAttacks.filter(a => 
+                (a.meds && a.meds.length > 0) || (a.followups && a.followups.some(f => f.med))
+            ).length;
+            document.getElementById('stat-meds-total').innerText = medsMonthlyCount;
+
+            // Recent List
+            const recentListEl = document.getElementById('recent-attacks-list');
+            const recent = state.attacks.slice(0, 3);
+            if (recent.length === 0) {
+                recentListEl.innerHTML = `<p class="text-xs text-sage-400 text-center py-4">Noch keine Anfälle erfasst.</p>`;
+                return;
+            }
+
+            recentListEl.innerHTML = recent.map(a => renderAttackCard(a)).join('');
+        }
+
+        // Render Attack Card Helper
+        function renderAttackCard(a) {
+            const painColor = a.pain >= 7 ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300 border-red-200' : (a.pain >= 4 ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300 border-amber-200' : 'bg-sage-100 text-sage-700 dark:bg-sage-800 dark:text-sage-300 border-sage-200');
+            const hasMed = (a.meds && a.meds.length > 0) || (a.followups && a.followups.some(f => f.med));
+            return `
+                <div onclick="openDetailModal('${a.id}')" class="bg-white dark:bg-sage-900 border border-sage-200 dark:border-sage-800 rounded-2xl p-4 shadow-xs hover:border-sage-400 transition cursor-pointer">
+                    <div class="flex justify-between items-start mb-2">
+                        <div class="flex items-center space-x-2">
+                            <span class="px-2.5 py-1 rounded-lg text-xs font-bold border ${painColor}">Schmerz: ${a.pain}/10</span>
+                            ${hasMed ? '<span class="text-xs px-2 py-0.5 rounded-md bg-sage-100 dark:bg-sage-800 text-sage-700 dark:text-sage-300 font-medium flex items-center space-x-1"><span>💊</span><span>Medikation</span></span>' : ''}
+                            <span class="text-xs text-sage-500">${formatDate(a.date)} • ${a.time}</span>
+                        </div>
+                        ${a.followups && a.followups.length > 0 ? '<span class="text-[10px] bg-sage-100 dark:bg-sage-800 text-sage-600 dark:text-sage-400 px-2 py-0.5 rounded-full font-medium">Follow-up</span>' : ''}
+                    </div>
+                    <div class="space-y-1 text-xs">
+                        ${a.symptoms.length > 0 ? `<p class="text-sage-600 dark:text-sage-400"><span class="font-medium text-sage-700 dark:text-sage-300">Symptome:</span> ${a.symptoms.join(', ')}</p>` : ''}
+                        ${a.meds.length > 0 ? `<p class="text-sage-600 dark:text-sage-400"><span class="font-medium text-sage-700 dark:text-sage-300">Medikamente:</span> ${a.meds.join(', ')}</p>` : ''}
+                    </div>
+                </div>
+            `;
+        }
+
+        function formatDate(dateStr) {
+            const parts = dateStr.split('-');
+            if (parts.length !== 3) return dateStr;
+            return `${parts[2]}.${parts[1]}.${parts[0]}`;
+        }
+
+        // Calendar View Logic
+        function changeMonth(direction) {
+            state.calendarDate.setMonth(state.calendarDate.getMonth() + direction);
+            renderCalendar();
+        }
+
+        function renderCalendar() {
+            const year = state.calendarDate.getFullYear();
+            const month = state.calendarDate.getMonth();
+            const monthNames = ["Januar", "Februar", "März", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "November", "Dezember"];
+            
+            document.getElementById('calendar-month-year').innerText = `${monthNames[month]} ${year}`;
+
+            const gridEl = document.getElementById('calendar-grid');
+            gridEl.innerHTML = '';
+
+            const firstDayIndex = (new Date(year, month, 1).getDay() + 6) % 7; // Monday start
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+            // Empty cells before start of month
+            for (let i = 0; i < firstDayIndex; i++) {
+                gridEl.innerHTML += `<div class="aspect-square bg-transparent"></div>`;
+            }
+
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dayStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                const dayAttacks = state.attacks.filter(a => a.date === dayStr);
+                
+                let indicatorHTML = '';
+                if (dayAttacks.length > 0) {
+                    const maxPain = Math.max(...dayAttacks.map(a => a.pain));
+                    const hasMed = dayAttacks.some(a => (a.meds && a.meds.length > 0) || (a.followups && a.followups.some(f => f.med)));
+                    const badgeColor = maxPain >= 7 ? 'bg-red-500 text-white shadow-xs' : (maxPain >= 4 ? 'bg-amber-500 text-white shadow-xs' : 'bg-sage-600 text-white shadow-xs');
+                    
+                    indicatorHTML = `
+                        <div class="mt-1 w-full px-1.5 py-1 rounded-xl ${badgeColor} text-xs font-bold flex items-center justify-center space-x-1">
+                            <span>${maxPain}</span>
+                            ${hasMed ? '<span class="text-[11px]">💊</span>' : ''}
+                        </div>
+                    `;
+                }
+
+                gridEl.innerHTML += `
+                    <div onclick="selectCalendarDay('${dayStr}')" class="aspect-square bg-sage-50 dark:bg-sage-800/50 rounded-xl border border-sage-200 dark:border-sage-700/60 flex flex-col items-center justify-between p-1.5 cursor-pointer hover:border-sage-500 transition">
+                        <span class="text-xs font-semibold text-sage-800 dark:text-sage-200">${day}</span>
+                        <div class="w-full flex items-center justify-center">
+                            ${indicatorHTML}
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        function selectCalendarDay(dateStr) {
+            const dayAttacks = state.attacks.filter(a => a.date === dateStr);
+            const detailContainer = document.getElementById('calendar-day-detail');
+            const dateTitle = document.getElementById('calendar-selected-date');
+            const listEl = document.getElementById('calendar-day-attacks');
+
+            dateTitle.innerText = `Anfälle am ${formatDate(dateStr)}`;
+            detailContainer.classList.remove('hidden');
+
+            if (dayAttacks.length === 0) {
+                listEl.innerHTML = `<p class="text-xs text-sage-400">Keine Anfälle an diesem Tag.</p>`;
+            } else {
+                listEl.innerHTML = dayAttacks.map(a => renderAttackCard(a)).join('');
+            }
+        }
+
+        // History View
+        function renderHistory() {
+            const query = document.getElementById('history-search').value.toLowerCase();
+            const listEl = document.getElementById('full-history-list');
+            
+            const filtered = state.attacks.filter(a => {
+                const matchSym = a.symptoms.some(s => s.toLowerCase().includes(query));
+                const matchMeds = a.meds.some(m => m.toLowerCase().includes(query));
+                const matchNotes = a.notes.toLowerCase().includes(query);
+                const matchTrig = a.triggers.some(t => t.toLowerCase().includes(query));
+                return matchSym || matchMeds || matchNotes || matchTrig || query === '';
+            });
+
+            document.getElementById('history-count').innerText = `${filtered.length} Einträge`;
+
+            if (filtered.length === 0) {
+                listEl.innerHTML = `<div class="bg-white dark:bg-sage-900 border border-sage-200 dark:border-sage-800 rounded-2xl p-6 text-center text-xs text-sage-400">Keine passenden Einträge gefunden.</div>`;
+                return;
+            }
+
+            listEl.innerHTML = filtered.map(a => renderAttackCard(a)).join('');
+        }
+
+        // Detail / Follow-up Modal & Editing
+        function openDetailModal(id) {
+            state.selectedAttackId = id;
+            const a = state.attacks.find(item => item.id === id);
+            if (!a) return;
+
+            document.getElementById('detail-title').innerText = `Migräneanfall am ${formatDate(a.date)}`;
+            document.getElementById('detail-subtitle').innerText = `Uhrzeit: ${a.time} Uhr`;
+
+            document.getElementById('detail-initial-info').innerHTML = `
+                <div class="flex items-center justify-between mb-1 pr-16">
+                    <span class="font-bold text-sage-800 dark:text-sage-200 text-sm">Schmerzstärke: ${a.pain}/10</span>
+                    <span class="text-xs text-sage-500">${a.time} Uhr</span>
+                </div>
+                ${a.symptoms.length > 0 ? `<p><span class="font-medium">Symptome:</span> ${a.symptoms.join(', ')}</p>` : ''}
+                ${a.triggers.length > 0 ? `<p><span class="font-medium">Auslöser:</span> ${a.triggers.join(', ')}</p>` : ''}
+                ${a.meds.length > 0 ? `<p><span class="font-medium">Medikation:</span> ${a.meds.join(', ')}</p>` : ''}
+                ${a.notes ? `<p class="italic text-sage-600 dark:text-sage-400 mt-1">„${a.notes}“</p>` : ''}
+            `;
+
+            renderFollowUpsList(a);
+            resetFollowUpForm();
+
+            document.getElementById('modal-detail').classList.remove('hidden');
+        }
+
+        function closeDetailModal() {
+            document.getElementById('modal-detail').classList.add('hidden');
+            state.selectedAttackId = null;
+            renderApp();
+        }
+
+        function editCurrentAttack() {
+            const a = state.attacks.find(item => item.id === state.selectedAttackId);
+            if (!a) return;
+            // Bug Fix: Correctly close the detail modal before opening the edit form
+            closeDetailModal();
+            openNewAttackModal(a);
+        }
+
+        function renderFollowUpsList(a) {
+            const container = document.getElementById('detail-followups-list');
+            if (!a.followups || a.followups.length === 0) {
+                container.innerHTML = `<p class="text-xs text-sage-400 italic">Noch keine Updates oder Verlaufsnotizen erfasst.</p>`;
+                return;
+            }
+
+            container.innerHTML = a.followups.map((fu, idx) => `
+                <div class="bg-white dark:bg-sage-900 border border-sage-200 dark:border-sage-800 p-3 rounded-xl text-xs space-y-1">
+                    <div class="flex justify-between items-center font-medium text-sage-700 dark:text-sage-300">
+                        <span>Schmerz: ${fu.pain}/10 ${fu.med ? `• 💊 ${fu.med}` : ''}</span>
+                        <div class="flex items-center space-x-2">
+                            <span class="text-[10px] text-sage-400">${fu.time}</span>
+                            <button onclick="editFollowUp(${idx})" class="text-sage-500 hover:text-sage-700 dark:hover:text-sage-300" title="Bearbeiten">✏️</button>
+                            <button onclick="deleteFollowUp(${idx})" class="text-red-400 hover:text-red-600" title="Löschen">🗑️</button>
+                        </div>
+                    </div>
+                    ${fu.note ? `<p class="text-sage-600 dark:text-sage-400">${fu.note}</p>` : ''}
+                </div>
+            `).join('');
+        }
+
+        function resetFollowUpForm() {
+            document.getElementById('edit-fu-index').value = '';
+            document.getElementById('fu-pain').value = '';
+            document.getElementById('fu-med').value = '';
+            document.getElementById('fu-note').value = '';
+            document.getElementById('fu-form-title').innerText = 'Update hinzufügen (Schmerzänderung, Medikament, Notiz)';
+            document.getElementById('fu-submit-btn').innerText = 'Update speichern';
+            document.getElementById('fu-cancel-btn').classList.add('hidden');
+        }
+
+        function saveFollowUp() {
+            const a = state.attacks.find(item => item.id === state.selectedAttackId);
+            if (!a) return;
+
+            const editIdx = document.getElementById('edit-fu-index').value;
+            const painInput = document.getElementById('fu-pain').value;
+            const pain = painInput !== '' ? parseInt(painInput) : a.pain;
+            const med = document.getElementById('fu-med').value;
+            const note = document.getElementById('fu-note').value;
+
+            if (painInput === '' && !med && !note) {
+                showToast('Bitte mindestens ein Feld ausfüllen.');
+                return;
+            }
+
+            if (!a.followups) a.followups = [];
+
+            if (editIdx !== '') {
+                // Edit existing follow-up
+                const idx = parseInt(editIdx);
+                a.followups[idx] = {
+                    ...a.followups[idx],
+                    pain: isNaN(pain) ? a.followups[idx].pain : pain,
+                    med: med !== undefined ? med : a.followups[idx].med,
+                    note: note !== undefined ? note : a.followups[idx].note
+                };
+                showToast('Follow-up aktualisiert!');
+            } else {
+                // Add new follow-up
+                a.followups.push({
+                    time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                    pain,
+                    med,
+                    note
+                });
+                showToast('Follow-up hinzugefügt!');
+            }
+
+            saveToLocalStorage();
+            openDetailModal(a.id);
+        }
+
+        function editFollowUp(idx) {
+            const a = state.attacks.find(item => item.id === state.selectedAttackId);
+            if (!a || !a.followups || !a.followups[idx]) return;
+            const fu = a.followups[idx];
+
+            document.getElementById('edit-fu-index').value = idx;
+            document.getElementById('fu-pain').value = fu.pain;
+            document.getElementById('fu-med').value = fu.med || '';
+            document.getElementById('fu-note').value = fu.note || '';
+            document.getElementById('fu-form-title').innerText = `Follow-up ${idx + 1} bearbeiten`;
+            document.getElementById('fu-submit-btn').innerText = 'Änderungen speichern';
+            document.getElementById('fu-cancel-btn').classList.remove('hidden');
+        }
+
+        function cancelFollowUpEdit() {
+            resetFollowUpForm();
+        }
+
+        function deleteFollowUp(idx) {
+            showConfirm('Follow-up löschen', 'Möchtest du diesen Verlaufseintrag wirklich löschen?', () => {
+                const a = state.attacks.find(item => item.id === state.selectedAttackId);
+                if (!a || !a.followups) return;
+                a.followups.splice(idx, 1);
+                saveToLocalStorage();
+                openDetailModal(a.id);
+                showToast('Follow-up gelöscht.');
+            });
+        }
+
+        function deleteCurrentAttack() {
+            showConfirm('Anfall löschen', 'Möchtest du diesen Anfall wirklich komplett löschen?', () => {
+                state.attacks = state.attacks.filter(item => item.id !== state.selectedAttackId);
+                saveToLocalStorage();
+                closeDetailModal();
+                showToast('Anfall gelöscht.');
+            });
+        }
+
+        // Statistics Render
+        function renderStats() {
+            document.getElementById('stats-total-count').innerText = state.attacks.length;
+
+            const medAttacksTotal = state.attacks.filter(a => 
+                (a.meds && a.meds.length > 0) || (a.followups && a.followups.some(f => f.med))
+            ).length;
+            document.getElementById('stats-med-attacks').innerText = medAttacksTotal;
+
+            // Frequency map for medications, triggers, symptoms
+            const medCounts = {};
+            const triggerCounts = {};
+            const symptomCounts = {};
+
+            state.attacks.forEach(a => {
+                if (a.meds) {
+                    a.meds.forEach(m => medCounts[m] = (medCounts[m] || 0) + 1);
+                }
+                if (a.followups) {
+                    a.followups.forEach(f => {
+                        if (f.med) medCounts[f.med] = (medCounts[f.med] || 0) + 1;
+                    });
+                }
+                if (a.triggers) {
+                    a.triggers.forEach(t => triggerCounts[t] = (triggerCounts[t] || 0) + 1);
+                }
+                if (a.symptoms) {
+                    a.symptoms.forEach(s => symptomCounts[s] = (symptomCounts[s] || 0) + 1);
+                }
+            });
+
+            // Render Medications Top List
+            const medListEl = document.getElementById('stats-meds-list');
+            const sortedMeds = Object.entries(medCounts).sort((a,b) => b[1] - a[1]);
+            if (sortedMeds.length === 0) {
+                medListEl.innerHTML = `<p class="text-xs text-sage-400">Keine Medikamente erfasst.</p>`;
+            } else {
+                medListEl.innerHTML = sortedMeds.slice(0, 5).map(([med, count]) => `
+                    <div class="flex justify-between items-center text-xs">
+                        <span class="text-sage-700 dark:text-sage-300">💊 ${med}</span>
+                        <span class="font-bold bg-sage-100 dark:bg-sage-800 text-sage-700 dark:text-sage-300 px-2 py-0.5 rounded-md">${count}x</span>
+                    </div>
+                `).join('');
+            }
+
+            // Render Triggers
+            const trigListEl = document.getElementById('stats-triggers-list');
+            const sortedTriggers = Object.entries(triggerCounts).sort((a,b) => b[1] - a[1]);
+            if (sortedTriggers.length === 0) {
+                trigListEl.innerHTML = `<p class="text-xs text-sage-400">Keine Auslöser erfasst.</p>`;
+            } else {
+                trigListEl.innerHTML = sortedTriggers.slice(0, 5).map(([trig, count]) => `
+                    <div class="flex justify-between items-center text-xs">
+                        <span class="text-sage-700 dark:text-sage-300">${trig}</span>
+                        <span class="font-bold bg-sage-100 dark:bg-sage-800 text-sage-700 dark:text-sage-300 px-2 py-0.5 rounded-md">${count}x</span>
+                    </div>
+                `).join('');
+            }
+
+            // Render Symptoms
+            const symListEl = document.getElementById('stats-symptoms-list');
+            const sortedSymptoms = Object.entries(symptomCounts).sort((a,b) => b[1] - a[1]);
+            if (sortedSymptoms.length === 0) {
+                symListEl.innerHTML = `<p class="text-xs text-sage-400">Keine Symptome erfasst.</p>`;
+            } else {
+                symListEl.innerHTML = sortedSymptoms.slice(0, 5).map(([sym, count]) => `
+                    <div class="flex justify-between items-center text-xs">
+                        <span class="text-sage-700 dark:text-sage-300">${sym}</span>
+                        <span class="font-bold bg-sage-100 dark:bg-sage-800 text-sage-700 dark:text-sage-300 px-2 py-0.5 rounded-md">${count}x</span>
+                    </div>
+                `).join('');
+            }
+        }
+
+        // Backup & Restore
+        function exportBackup() {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify({
+                attacks: state.attacks,
+                settings: state.settings,
+                exportDate: new Date().toISOString()
+            }, null, 2));
+            const downloadAnchor = document.createElement('a');
+            downloadAnchor.setAttribute("href", dataStr);
+            downloadAnchor.setAttribute("download", `salbei_migraene_backup_${new Date().toISOString().split('T')[0]}.json`);
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            downloadAnchor.remove();
+            showToast('Backup erfolgreich heruntergeladen!');
+        }
+
+        function importBackup(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                try {
+                    const parsed = JSON.parse(event.target.result);
+                    if (parsed.attacks && Array.isArray(parsed.attacks)) {
+                        state.attacks = parsed.attacks;
+                        if (parsed.settings) state.settings = parsed.settings;
+                        saveToLocalStorage();
+                        applyDarkModeState();
+                        renderApp();
+                        showToast('Backup erfolgreich wiederhergestellt!');
+                    } else {
+                        showToast('Ungültiges Backup-Format.');
+                    }
+                } catch(err) {
+                    showToast('Fehler beim Lesen der JSON-Datei.');
+                }
+            };
+            reader.readAsText(file);
+        }
+    </script>
+</body>
+</html>
